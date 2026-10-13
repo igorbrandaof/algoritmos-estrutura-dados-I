@@ -41,8 +41,6 @@ cd algoritmos-estrutura-dados-I
 code .
 ```
 
-> Substitua `igorbrandaof` pelo seu usuário GitHub após publicar o repositório.
-
 4. Rode a aplicação bancária:
 
 ```powershell
@@ -173,7 +171,7 @@ A estrutura interna é abstraída: o cadastro decide qual fila usar e delega a i
 
 ## 🧪 Testes e validação
 
-O arquivo `executar_testes.py` roda as seis suítes com `unittest`. Para executar cada suíte separadamente:
+Os **28 testes existentes passaram nas seis suítes** na verificação para publicação. O arquivo `executar_testes.py` roda as seis suítes com `unittest`. Para executar cada suíte separadamente:
 
 ```powershell
 cd entregavel_01
@@ -188,6 +186,7 @@ Repita nas demais pastas, ou use o script central a partir da raiz. O status e a
 - [Apresentação (PowerPoint)](documentacao/APRESENTACAO.pptx)
 - [Roteiro de apresentação](documentacao/ROTEIRO_APRESENTACAO.md)
 - [Checklist de entrega](documentacao/CHECKLIST_ENTREGA.md)
+- [Resultado dos testes](documentacao/RESULTADO_TESTES.md)
 - Relatórios individuais: arquivo `RELATORIO.md` em cada pasta.
 
 **Referências:** Cormen et al., *Algoritmos: Teoria e Prática*; Ziviani, *Projeto de Algoritmos*; Celes, Cerqueira e Rangel, *Introdução a Estruturas de Dados*; [documentação Python](https://docs.python.org/3/).
