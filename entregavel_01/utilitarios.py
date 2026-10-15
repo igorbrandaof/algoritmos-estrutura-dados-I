@@ -1,11 +1,11 @@
 """Biblioteca de funções matemáticas e utilitárias: módulo 1."""
 def fatorial(n):
-    if not isinstance(n,int) or n<0: raise ValueError('n deve ser inteiro nao negativo')
+    if type(n) is not int or n<0: raise ValueError('n deve ser inteiro nao negativo')
     if n<=1:return 1
     return n*fatorial(n-1)
 
 def fibonacci(n):
-    if not isinstance(n,int) or n<0: raise ValueError('n deve ser inteiro nao negativo')
+    if type(n) is not int or n<0: raise ValueError('n deve ser inteiro nao negativo')
     if n<=1:return n
     return fibonacci(n-1)+fibonacci(n-2)
 

@@ -2,8 +2,8 @@
 
 **Curso:** Engenharia de Software  
 **Disciplina:** Algoritmos e Estrutura de Dados I  
-**Aluno:** [preencher]  
-**Professor:** [preencher]
+**Aluno:** Igor Fillipe Brandão Machado  
+**Professor:** George Mendes Marra
 
 ## 1. Objetivo
 LIFO e aplicação de balanceamento.
@@ -22,3 +22,8 @@ A aplicação ignora caracteres que não sejam delimitadores. Em expressões rea
 
 ## 6. Conclusão
 A implementação permite comparar custos de operações e compreender como a representação interna influencia o comportamento do TAD. As estruturas foram construídas explicitamente para fins didáticos, em vez de depender das coleções prontas da biblioteca padrão.
+
+
+## Validação ampliada
+
+7 testes nesta entrega, incluindo os originais e casos de fronteira em `testes_limites.py`. Na raiz: `python -m unittest discover -s entregavel_04 -p "testes*.py" -v`.

@@ -3,22 +3,55 @@ Estatico: vetor de capacidade fixa (lista Python prealocada).
 Dinamico: nos ligados, alocados sob demanda pelo runtime Python.
 Nao representa malloc/free; Python usa gerenciamento automatico.
 """
+from decimal import Decimal, InvalidOperation
+
+
+def _valor_monetario(valor):
+    if isinstance(valor, bool) or not isinstance(valor, (int, float, str, Decimal)):
+        raise ValueError('valor monetario invalido')
+    try:
+        numero = Decimal(str(valor))
+    except InvalidOperation as erro:
+        raise ValueError('valor monetario invalido') from erro
+    if not numero.is_finite() or numero < 0:
+        raise ValueError('use valor finito nao negativo, com ate duas casas decimais')
+    try:
+        centavos = numero.quantize(Decimal('0.01'))
+    except InvalidOperation as erro:
+        raise ValueError('valor monetario fora do limite') from erro
+    if numero != centavos:
+        raise ValueError('use valor finito nao negativo, com ate duas casas decimais')
+    return centavos
+
+
 class Conta:
- def __init__(self,numero,titular,saldo=0):
-  if not numero or not titular.strip() or saldo<0:raise ValueError('dados invalidos')
-  self.numero=numero;self.titular=titular.strip();self._saldo=float(saldo)
- @property
- def saldo(self):return self._saldo
- def depositar(self,valor):
-  if valor<=0:raise ValueError('valor deve ser positivo')
-  self._saldo+=valor
- def sacar(self,valor):
-  if valor<=0 or valor>self._saldo:raise ValueError('saldo insuficiente ou valor invalido')
-  self._saldo-=valor
+    """TAD monetário com Decimal: 0.10 + 0.20 é exatamente 0.30."""
+    def __init__(self, numero, titular, saldo=0):
+        if not isinstance(numero, str) or not numero.strip() or not isinstance(titular, str) or not titular.strip():
+            raise ValueError('dados invalidos')
+        self.numero = numero.strip()
+        self.titular = titular.strip()
+        self._saldo = _valor_monetario(saldo)
+
+    @property
+    def saldo(self):
+        return self._saldo
+
+    def depositar(self, valor):
+        valor = _valor_monetario(valor)
+        if valor <= 0:
+            raise ValueError('valor deve ser positivo')
+        self._saldo += valor
+
+    def sacar(self, valor):
+        valor = _valor_monetario(valor)
+        if valor <= 0 or valor > self._saldo:
+            raise ValueError('saldo insuficiente ou valor invalido')
+        self._saldo -= valor
 
 class BancoEstatico:
  def __init__(self,capacidade):
-  if capacidade<1:raise ValueError('capacidade invalida')
+  if type(capacidade) is not int or capacidade<1:raise ValueError('capacidade invalida')
   self._dados=[None]*capacidade;self._n=0
  def inserir(self,conta):
   if self.buscar(conta.numero) is not None:raise ValueError('numero duplicado')

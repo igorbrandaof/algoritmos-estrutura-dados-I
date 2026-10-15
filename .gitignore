@@ -21,3 +21,9 @@ dist/
 # Test reports
 .coverage
 htmlcov/
+
+# Sessões pessoais e relatórios locais
+dados/
+.sessao-*.tmp
+sessao_bancaria.json
+relatorio_atendimento.csv
