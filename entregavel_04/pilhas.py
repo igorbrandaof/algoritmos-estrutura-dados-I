@@ -1,6 +1,6 @@
 class PilhaArray:
  def __init__(self,capacidade):
-  if capacidade<1:raise ValueError('capacidade invalida')
+  if type(capacidade) is not int or capacidade<1:raise ValueError('capacidade invalida')
   self._dados=[None]*capacidade;self._n=0
  def vazia(self):return self._n==0
  def push(self,v):

@@ -2,8 +2,8 @@
 
 **Curso:** Engenharia de Software  
 **Disciplina:** Algoritmos e Estrutura de Dados I  
-**Aluno:** [preencher]  
-**Professor:** [preencher]
+**Aluno:** Igor Fillipe Brandão Machado  
+**Professor:** George Mendes Marra
 
 ## 1. Objetivo
 Encapsulamento, capacidade fixa e objetos dinâmicos.
@@ -22,3 +22,10 @@ Em Python, o vetor é uma lista prealocada com tamanho fixo lógico, não uma al
 
 ## 6. Conclusão
 A implementação permite comparar custos de operações e compreender como a representação interna influencia o comportamento do TAD. As estruturas foram construídas explicitamente para fins didáticos, em vez de depender das coleções prontas da biblioteca padrão.
+
+
+## Validação ampliada
+
+9 testes nesta entrega, incluindo os originais e casos de fronteira em `testes_limites.py`. Na raiz: `python -m unittest discover -s entregavel_02 -p "testes*.py" -v`.
+
+O TAD Conta usa `Decimal` para centavos exatos. Aceita valores finitos, não negativos e com até duas casas decimais; depósito/saque exige valor positivo. O saldo é exposto como Decimal. O exercício permanece independente do atendimento bancário.

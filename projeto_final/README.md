@@ -1,19 +1,45 @@
-# Projeto final — Atendimento Bancário
+# Projeto final — Sistema de Gerenciamento de Atendimento Bancário
 
-## Objetivo
-Integração de fila, lista e pilha
+Integra fila de prioridade, lista de histórico e duas pilhas de comandos. Oferece interface gráfica Tkinter e terminal usando o mesmo núcleo.
 
-## Implementação e interface
-O sistema gera senhas N001/P001, mantém duas filas encadeadas, atende primeiro prioritários e registra atendimentos em lista encadeada. Uma pilha registra atendimentos reversíveis. O menu inclui cadastro, atendimento, visualização de filas, histórico, desfazer e consulta por senha.
+## Executar da raiz
 
-## Execução
-Na pasta deste módulo, execute `python demo.py` (módulos 1–5) ou `python main.py` (projeto final).
+```bash
+python projeto_final/interface_grafica.py
+python projeto_final/interface_grafica.py --demo
+python projeto_final/main.py
+python projeto_final/main.py --gui
+```
+
+Sem bibliotecas Python externas. Python 3.10+; Tkinter e display gráfico apenas para a GUI. Os atalhos `abrir_interface.bat` e `abrir_interface.sh` ficam na raiz.
+
+## Arquivos
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `cliente.py` | Registro imutável de cliente, senha, categoria e ordem de chegada |
+| `estruturas.py` | Fila, pilha e lista encadeadas implementadas manualmente |
+| `sistema.py` | Prioridade, cadastro, atendimento, pesquisa, cancelamento, undo/redo |
+| `persistencia.py` | Sessões JSON validadas e exportação CSV |
+| `main.py` | Interface de terminal |
+| `interface_grafica.py` | Janela, tabelas, botões, indicadores e modo didático |
+| `testes.py` | Dez testes originais |
+| `testes_novos.py` | 36 testes adicionais de integração e persistência |
+| `test_interface_grafica.py` | 15 testes de widgets reais, executados separadamente |
+| `ESPECIFICACAO_TAD.md` | Contratos e invariantes |
 
 ## Testes
-`python -m unittest testes.py -v`
 
-## Complexidade
-Cadastro: O(1); atender: O(1); desfazer: O(1); exibir filas/histórico: O(n); consultar histórico por senha: O(n). Espaço total O(n).
+```bash
+# Na raiz
+python -m unittest discover -s projeto_final -p "testes*.py" -v
+python executar_testes.py --gui
+```
 
-## Limitações e decisões
-Regra de reversão: um novo cadastro invalida a pilha de desfazer, preservando o histórico. Isso evita reverter uma operação após alterações de fila não cobertas pela pilha. Dados são voláteis e não representam um banco real.
+Dentro desta pasta, execute `python -m unittest test_interface_grafica -v` para testar somente a GUI.
+
+## Regras
+
+Prioridade estrita, FIFO por chegada em cada categoria; senha permanente mesmo após reclassificação. Atendimento e reclassificação são reversíveis; cadastro e cancelamento reiniciam as pilhas. Abrir sessão restaura dados e limpa reversões. Não há salvamento automático.
+
+Veja [manual](../documentacao/MANUAL_USUARIO.md), [arquitetura](../documentacao/ARQUITETURA.md) e [relatório](RELATORIO.md).

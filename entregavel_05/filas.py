@@ -1,6 +1,6 @@
 class FilaCircular:
  def __init__(self,capacidade):
-  if capacidade<1:raise ValueError('capacidade invalida')
+  if type(capacidade) is not int or capacidade<1:raise ValueError('capacidade invalida')
   self._v=[None]*capacidade;self._inicio=0;self._n=0
  def vazia(self):return self._n==0
  def enfileirar(self,v):

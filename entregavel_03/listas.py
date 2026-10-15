@@ -1,7 +1,7 @@
 """TADs: lista sequencial fixa, simplesmente encadeada, dupla e circular."""
 class ListaSequencial:
  def __init__(self,capacidade):
-  if capacidade<=0:raise ValueError('capacidade invalida')
+  if type(capacidade) is not int or capacidade<=0:raise ValueError('capacidade invalida')
   self._v=[None]*capacidade;self._n=0
  def inserir(self,indice,valor):
   if not 0<=indice<=self._n:raise IndexError(indice)
