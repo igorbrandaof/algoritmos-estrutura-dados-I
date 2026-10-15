@@ -160,7 +160,6 @@ O vetor de capacidade fixa dos exercícios é uma **simulação** de armazenamen
 - [Mapa dos cinco entregáveis](documentacao/MAPA_ENTREGAVEIS.md)
 - [Relatório técnico atualizado](projeto_final/RELATORIO.md)
 - [Resultados dos testes](documentacao/RESULTADO_TESTES.md)
-- [Alterações da versão](CHANGELOG.md)
 - [Relatório Word original](documentacao/RELATORIO_CONSOLIDADO.docx)
 - [Apresentação PowerPoint original](documentacao/APRESENTACAO.pptx)
 
