@@ -22,7 +22,7 @@ Sem bibliotecas Python externas. Python 3.10+; Tkinter e display gráfico apenas
 | `sistema.py` | Prioridade, cadastro, atendimento, pesquisa, cancelamento, undo/redo |
 | `persistencia.py` | Sessões JSON validadas e exportação CSV |
 | `main.py` | Interface de terminal |
-| `interface_grafica.py` | Janela, tabelas, botões, indicadores e modo didático |
+| `interface_grafica.py` | Janela simplificada, cadastro, fila, histórico e menus |
 | `testes.py` | Dez testes originais |
 | `testes_novos.py` | 36 testes adicionais de integração e persistência |
 | `test_interface_grafica.py` | 15 testes de widgets reais, executados separadamente |
@@ -43,3 +43,4 @@ Dentro desta pasta, execute `python -m unittest test_interface_grafica -v` para 
 Prioridade estrita, FIFO por chegada em cada categoria; senha permanente mesmo após reclassificação. Atendimento e reclassificação são reversíveis; cadastro e cancelamento reiniciam as pilhas. Abrir sessão restaura dados e limpa reversões. Não há salvamento automático.
 
 Veja [manual](../documentacao/MANUAL_USUARIO.md), [arquitetura](../documentacao/ARQUITETURA.md) e [relatório](RELATORIO.md).
+

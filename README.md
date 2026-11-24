@@ -1,4 +1,4 @@
-# Banco Acadêmico — Algoritmos e Estrutura de Dados I
+# Central de Atendimento Bancário
 
 Sistema de Gerenciamento de Atendimento Bancário em **Python**, com interface gráfica de desktop, terminal e cinco entregáveis da disciplina. Filas, pilhas e listas são implementadas manualmente com nós e vetores para demonstrar os conceitos de Algoritmos e Estrutura de Dados I.
 
@@ -28,7 +28,7 @@ py -3 -m tkinter
 py -3 projeto_final/interface_grafica.py
 ```
 
-Também é possível abrir `abrir_interface.bat` com dois cliques. Se `py` não existir, use `python` nos comandos. A janela de `python -m tkinter` serve para verificar a instalação.
+Também é possível abrir `abrir_interface.bat` com dois cliques. Para apresentar o protótipo com clientes fictícios, abra `apresentar_prototipo.bat`. Se `py` não existir, use `python` nos comandos. A janela de `python -m tkinter` serve para verificar a instalação.
 
 ### Linux e macOS
 
@@ -56,6 +56,12 @@ python3 -m venv .venv
 
 Não é necessário executar `pip install`. Tkinter é um componente da instalação do Python/sistema operacional, não uma dependência instalada pelo pip.
 
+## Interface simplificada
+
+A tela principal reúne cadastro de cliente, tipo de atendimento, geração de senha, próximo cliente e fila. O histórico fica na segunda aba. Os totais aparecem em uma linha discreta; abrir/salvar/exportar e carregar demonstração ficam no menu **Arquivo**. Desfazer/refazer, reclassificação e cancelamento continuam disponíveis.
+
+O nome do sistema é **Central de Atendimento Bancário**: ele representa o controle de fila de um banco comum. A identificação da disciplina fica na documentação do trabalho.
+
 ## Funcionalidades
 
 | Recurso | Comportamento |
@@ -70,7 +76,6 @@ Não é necessário executar `pip install`. Tkinter é um componente da instala�
 | Indicadores | Pendentes, prioritários, atendidos e cancelados |
 | Sessões JSON | Salvamento manual atômico e abertura com validação integral |
 | Relatório CSV | Fila e histórico em UTF-8, compatível com planilhas |
-| Modo didático | Visualiza filas e quantidades das pilhas; conecta aos cinco entregáveis |
 | Demonstração | Carrega clientes fictícios por ação explícita |
 
 A busca filtra a tabela, mas **não altera quem será chamado**. O campo “Próximo atendimento” sempre representa a fila completa.
@@ -108,7 +113,7 @@ python executar_testes.py --gui
 
 No Windows, `python` pode ser substituído por `py -3`; no Linux/macOS, por `python3`. Também funcionam `python -m projeto_final.main` e `python -m projeto_final.interface_grafica`.
 
-**Validação desta versão:** 92 testes de algoritmos/domínio/persistência e 15 testes de interface, totalizando **107 testes aprovados**. Os 28 testes originais foram mantidos. O workflow em `.github/workflows/testes.yml` propõe execução automática em Python 3.10/3.12/3.13 e testes gráficos em Linux; a primeira execução remota depende do envio aprovado. Evidências e limites: [RESULTADO_TESTES.md](documentacao/RESULTADO_TESTES.md).
+**Validação desta versão:** 92 testes de algoritmos/domínio/persistência e 15 testes de interface, totalizando **107 testes aprovados**. Os 28 testes originais foram mantidos. Evidências e limites: [RESULTADO_TESTES.md](documentacao/RESULTADO_TESTES.md).
 
 Para testar um entregável isolado, na raiz:
 
@@ -172,3 +177,4 @@ A organização por módulos, a separação entre núcleo e interface e a ideia 
 Referências conceituais: Cormen et al., *Algoritmos: Teoria e Prática*; Ziviani, *Projeto de Algoritmos*; documentação oficial de Python, `unittest`, `tkinter` e `decimal`.
 
 Nenhuma licença adicional foi escolhida para este repositório. Uma eventual licença deve ser definida pelo autor.
+

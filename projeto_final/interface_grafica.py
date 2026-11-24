@@ -38,9 +38,9 @@ class AplicacaoBancaria:
         self.prioridade = tk.StringVar(value="Normal")
         self.busca = tk.StringVar()
         self.status = tk.StringVar(value="Pronto. Cadastre um cliente para iniciar o atendimento.")
-        self.root.title("Banco Acadêmico • Atendimento")
-        self.root.geometry("1240x820")
-        self.root.minsize(1060, 740)
+        self.root.title("Central de Atendimento Bancário")
+        self.root.geometry("1000x700")
+        self.root.minsize(900, 640)
         self.root.configure(bg=FUNDO)
         self.root.rowconfigure(3, weight=1)
         self.root.columnconfigure(0, weight=1)
@@ -60,131 +60,110 @@ class AplicacaoBancaria:
         estilo = ttk.Style(self.root)
         estilo.theme_use("clam")
         estilo.configure("TFrame", background=FUNDO)
-        estilo.configure("Card.TFrame", background="white")
         estilo.configure("TLabel", background=FUNDO, foreground=TEXTO, font=(self.fonte, 10))
+        estilo.configure("Card.TFrame", background="white")
         estilo.configure("Card.TLabel", background="white", foreground=TEXTO)
         estilo.configure("Muted.TLabel", background="white", foreground=CINZA, font=(self.fonte, 9))
-        estilo.configure("Title.TLabel", background="white", font=(self.fonte, 15, "bold"))
-        estilo.configure("TButton", font=(self.fonte, 10), padding=(12, 9), background="white", foreground=TEXTO)
-        estilo.map("TButton", background=[("active", "#e8edf5")], foreground=[("disabled", "#a2acbb")])
-        estilo.configure("Primary.TButton", background=VERDE, foreground="white", borderwidth=0)
-        estilo.map("Primary.TButton", background=[("disabled", "#c2d6d2"), ("active", "#086b5f")],
-                   foreground=[("disabled", "#617d77")])
-        estilo.configure("TEntry", padding=8, fieldbackground="white")
-        estilo.configure("TCombobox", padding=8, fieldbackground="white")
+        estilo.configure("TLabelframe", background="white", bordercolor="#d5dbe2", relief="solid")
+        estilo.configure("TLabelframe.Label", background="white", foreground=TEXTO, font=(self.fonte, 10, "bold"))
+        estilo.configure("TButton", font=(self.fonte, 10), padding=(12, 8), background="white", foreground=TEXTO)
+        estilo.map("TButton", background=[("active", "#e8edf3")], foreground=[("disabled", "#969da8")])
+        estilo.configure("Primary.TButton", background=AZUL, foreground="white", borderwidth=0)
+        estilo.map("Primary.TButton", background=[("disabled", "#c3ccd6"), ("active", "#23486e")],
+                   foreground=[("disabled", "#65778a")])
+        estilo.configure("TEntry", padding=7, fieldbackground="white")
+        estilo.configure("TCombobox", padding=7, fieldbackground="white")
         estilo.configure("Treeview", background="white", fieldbackground="white", foreground=TEXTO,
-                         rowheight=40, font=(self.fonte, 10), borderwidth=0)
-        estilo.configure("Treeview.Heading", background="#eef2f7", foreground=CINZA,
-                         padding=12, font=(self.fonte, 9, "bold"), relief="flat")
-        estilo.map("Treeview", background=[("selected", "#d6eee8")], foreground=[("selected", AZUL)])
+                         rowheight=34, font=(self.fonte, 10), borderwidth=0)
+        estilo.configure("Treeview.Heading", background="#edf1f5", foreground=TEXTO,
+                         padding=(10, 9), font=(self.fonte, 9, "bold"), relief="flat")
+        estilo.map("Treeview", background=[("selected", "#dbe8f5")], foreground=[("selected", TEXTO)])
         estilo.configure("TNotebook", background=FUNDO, borderwidth=0)
-        estilo.configure("TNotebook.Tab", padding=(18, 11), font=(self.fonte, 10))
-        estilo.map("TNotebook.Tab", background=[("selected", "white")], foreground=[("selected", VERDE)])
+        estilo.configure("TNotebook.Tab", padding=(18, 9), font=(self.fonte, 10))
+        estilo.map("TNotebook.Tab", background=[("selected", "white")])
 
     def _construir(self):
-        cabecalho = tk.Frame(self.root, bg=AZUL, padx=26, pady=18)
+        self.menu_arquivo = tk.Menu(self.root, tearoff=False)
+        for titulo, comando in (("Abrir sessão...", self.abrir), ("Salvar sessão...", self.salvar),
+                                ("Exportar CSV...", self.exportar)):
+            self.menu_arquivo.add_command(label=titulo, command=comando)
+        self.menu_arquivo.add_separator()
+        self.menu_arquivo.add_command(label="Carregar demonstração", command=self.demonstracao)
+        self.menu_arquivo.add_separator()
+        self.menu_arquivo.add_command(label="Sair", command=self.fechar)
+        menu = tk.Menu(self.root)
+        menu.add_cascade(label="Arquivo", menu=self.menu_arquivo)
+        self.root.configure(menu=menu)
+
+        cabecalho = ttk.Frame(self.root, padding=(22, 18, 22, 12))
         cabecalho.grid(row=0, column=0, sticky="ew")
-        tk.Label(cabecalho, text="B /  BANCO ACADÊMICO", bg=AZUL, fg="white",
-                 font=(self.fonte, 17, "bold")).pack(side="left")
-        tk.Label(cabecalho, text="AED I   •   SIMULAÇÃO EDUCACIONAL", bg=AZUL, fg="#b7cadf",
-                 font=(self.fonte, 9)).pack(side="right")
-        barra = ttk.Frame(self.root, padding=(24, 16, 24, 12))
-        barra.grid(row=1, column=0, sticky="ew")
-        ttk.Label(barra, text="Central de atendimento", font=(self.fonte, 20, "bold")).pack(side="left")
-        for rotulo, comando in (("Exportar CSV", self.exportar), ("Salvar sessão", self.salvar), ("Abrir sessão", self.abrir)):
-            ttk.Button(barra, text=rotulo, command=comando).pack(side="right", padx=(6, 0))
-        indicadores = ttk.Frame(self.root, padding=(24, 0, 24, 16))
-        indicadores.grid(row=2, column=0, sticky="ew")
-        self.indicadores = {}
-        for i, (chave, rotulo, cor) in enumerate((("pendentes", "NA FILA", AZUL), ("prioritarios", "PRIORITÁRIOS", VERDE),
-                                               ("atendidos", "ATENDIDOS", AZUL), ("cancelados", "CANCELADOS", CINZA))):
-            indicadores.columnconfigure(i, weight=1, uniform="cards")
-            card = ttk.Frame(indicadores, style="Card.TFrame", padding=(18, 12))
-            card.grid(row=0, column=i, sticky="ew", padx=(0 if i == 0 else 10, 0))
-            ttk.Label(card, text=rotulo, style="Muted.TLabel").pack(anchor="w")
-            valor = tk.StringVar(value="0")
-            tk.Label(card, textvariable=valor, bg="white", fg=cor, font=(self.fonte, 26, "bold")).pack(anchor="w")
-            self.indicadores[chave] = valor
-        conteudo = ttk.Frame(self.root, padding=(24, 0, 24, 0))
-        conteudo.grid(row=3, column=0, sticky="nsew")
-        lateral = ttk.Frame(conteudo, style="Card.TFrame", padding=16, width=290)
-        lateral.pack(side="left", fill="y", padx=(0, 16))
-        lateral.pack_propagate(False)
-        self.botao_demo = ttk.Button(lateral, text="Carregar demonstração", command=self.demonstracao)
-        self.botao_demo.pack(side="bottom", fill="x", pady=(0, 4))
-        ttk.Label(lateral, text="Novo cliente", style="Title.TLabel").pack(anchor="w", pady=(0, 8))
-        ttk.Label(lateral, text="Gere uma senha e entre na fila.", style="Muted.TLabel").pack(anchor="w", pady=(0, 8))
-        ttk.Label(lateral, text="Nome completo", style="Card.TLabel").pack(anchor="w")
-        self.entrada_nome = ttk.Entry(lateral, textvariable=self.nome)
-        self.entrada_nome.pack(fill="x", pady=(6, 10))
+        ttk.Label(cabecalho, text="Central de Atendimento Bancário",
+                  font=(self.fonte, 20, "bold")).pack(anchor="w")
+        ttk.Label(cabecalho, text="Controle de senhas e fila de atendimento", foreground=CINZA).pack(anchor="w", pady=(4, 0))
+
+        cadastro = ttk.LabelFrame(self.root, text=" Nova senha ", padding=(16, 10, 16, 14))
+        cadastro.grid(row=1, column=0, sticky="ew", padx=22, pady=(0, 12))
+        cadastro.columnconfigure(0, weight=1)
+        ttk.Label(cadastro, text="Nome do cliente", style="Card.TLabel").grid(row=0, column=0, sticky="w", pady=(0, 5))
+        ttk.Label(cadastro, text="Tipo de atendimento", style="Card.TLabel").grid(row=0, column=1, sticky="w", padx=(12, 0), pady=(0, 5))
+        self.entrada_nome = ttk.Entry(cadastro, textvariable=self.nome)
+        self.entrada_nome.grid(row=1, column=0, sticky="ew")
         self.entrada_nome.bind("<Return>", lambda _: self.cadastrar())
-        ttk.Label(lateral, text="Categoria de atendimento", style="Card.TLabel").pack(anchor="w")
-        ttk.Combobox(lateral, textvariable=self.prioridade, values=("Normal", "Prioritário"), state="readonly").pack(fill="x", pady=(6, 16))
-        ttk.Button(lateral, text="+  Cadastrar cliente", style="Primary.TButton", command=self.cadastrar).pack(fill="x")
-        ttk.Separator(lateral).pack(fill="x", pady=10)
-        ttk.Label(lateral, text="Como funciona", style="Card.TLabel", font=(self.fonte, 11, "bold")).pack(anchor="w", pady=(0, 10))
-        ttk.Label(lateral, text="Cadastre → confira a fila.\nChame o próximo → histórico.",
-                  style="Muted.TLabel", justify="left").pack(anchor="w")
-        ttk.Label(lateral, text="Prioridade estrita, com FIFO\nem cada categoria.",
-                  style="Muted.TLabel", justify="left").pack(anchor="w", pady=(12, 0))
-        direita = ttk.Frame(conteudo)
-        direita.pack(side="left", fill="both", expand=True)
-        direita.rowconfigure(0, weight=1)
-        direita.columnconfigure(0, weight=1)
-        self.abas = ttk.Notebook(direita)
-        self.abas.grid(row=0, column=0, sticky="nsew")
-        fila = ttk.Frame(self.abas, style="Card.TFrame", padding=16)
-        historico = ttk.Frame(self.abas, style="Card.TFrame", padding=16)
-        didatica = ttk.Frame(self.abas, style="Card.TFrame", padding=18)
+        ttk.Combobox(cadastro, textvariable=self.prioridade, values=("Normal", "Prioritário"),
+                     state="readonly", width=16).grid(row=1, column=1, sticky="ew", padx=12)
+        self.botao_cadastrar = ttk.Button(cadastro, text="Gerar senha", command=self.cadastrar)
+        self.botao_cadastrar.grid(row=1, column=2, sticky="ew")
+
+        chamada = ttk.Frame(self.root, style="Card.TFrame", padding=(16, 12))
+        chamada.grid(row=2, column=0, sticky="ew", padx=22, pady=(0, 12))
+        chamada.columnconfigure(0, weight=1)
+        ttk.Label(chamada, text="Próximo da fila", style="Muted.TLabel").grid(row=0, column=0, sticky="w")
+        self.proximo_texto = tk.StringVar()
+        ttk.Label(chamada, textvariable=self.proximo_texto, style="Card.TLabel",
+                  font=(self.fonte, 14, "bold"), wraplength=520).grid(row=1, column=0, sticky="w", pady=(4, 0))
+        self.botao_atender = ttk.Button(chamada, text="Chamar próximo", style="Primary.TButton", command=self.atender)
+        self.botao_atender.grid(row=0, column=1, rowspan=2, sticky="e", padx=(12, 0))
+
+        self.abas = ttk.Notebook(self.root)
+        self.abas.grid(row=3, column=0, sticky="nsew", padx=22)
+        fila = ttk.Frame(self.abas, style="Card.TFrame", padding=14)
+        historico = ttk.Frame(self.abas, style="Card.TFrame", padding=14)
         self.abas.add(fila, text="Fila de espera")
-        self.abas.add(historico, text="Histórico")
-        self.abas.add(didatica, text="Estruturas de dados")
+        self.abas.add(historico, text="Histórico de atendimentos")
         for aba in (fila, historico):
             aba.rowconfigure(1, weight=1)
             aba.columnconfigure(0, weight=1)
         pesquisa = ttk.Frame(fila, style="Card.TFrame")
-        pesquisa.grid(row=0, column=0, sticky="ew", pady=(0, 12))
-        ttk.Label(pesquisa, text="Ordem real de atendimento", style="Card.TLabel", font=(self.fonte, 11, "bold")).pack(side="left")
-        ttk.Entry(pesquisa, textvariable=self.busca, width=23).pack(side="right")
-        ttk.Label(pesquisa, text="Buscar nome ou senha  ", style="Muted.TLabel").pack(side="right")
-        self.tabela_fila = self._tabela(fila, ("posicao", "senha", "nome", "categoria"), ("POSIÇÃO", "SENHA", "CLIENTE", "CATEGORIA"))
+        pesquisa.grid(row=0, column=0, sticky="ew", pady=(0, 10))
+        ttk.Label(pesquisa, text="Prioritários primeiro; ordem de chegada em cada tipo.", style="Muted.TLabel").pack(side="left")
+        ttk.Entry(pesquisa, textvariable=self.busca, width=20).pack(side="right")
+        ttk.Label(pesquisa, text="Buscar  ", style="Muted.TLabel").pack(side="right")
+        self.tabela_fila = self._tabela(fila, ("posicao", "senha", "nome", "categoria"), ("POSIÇÃO", "SENHA", "CLIENTE", "TIPO"))
         self.tabela_fila.bind("<<TreeviewSelect>>", lambda _: self._botoes())
-        self.resumo_fila = tk.StringVar()
-        ttk.Label(fila, textvariable=self.resumo_fila, style="Muted.TLabel").grid(row=2, column=0, sticky="w", pady=(8, 10))
         acoes = ttk.Frame(fila, style="Card.TFrame")
-        acoes.grid(row=3, column=0, sticky="ew")
-        self.botao_reclassificar = ttk.Button(acoes, text="Alterar prioridade", command=self.reclassificar)
-        self.botao_reclassificar.pack(side="left")
+        acoes.grid(row=2, column=0, sticky="ew", pady=(10, 0))
+        self.resumo_fila = tk.StringVar()
+        ttk.Label(acoes, textvariable=self.resumo_fila, style="Muted.TLabel").pack(side="left")
         self.botao_cancelar = ttk.Button(acoes, text="Cancelar senha", command=self.cancelar)
-        self.botao_cancelar.pack(side="left", padx=8)
-        ttk.Label(historico, text="Atendimentos • mais recente primeiro", style="Title.TLabel").grid(row=0, column=0, sticky="w", pady=(0, 8))
-        self.tabela_historico = self._tabela(historico, ("senha", "nome", "categoria"), ("SENHA", "CLIENTE", "CATEGORIA"))
+        self.botao_cancelar.pack(side="right")
+        self.botao_reclassificar = ttk.Button(acoes, text="Alterar prioridade", command=self.reclassificar)
+        self.botao_reclassificar.pack(side="right", padx=(8, 8))
+        ttk.Label(historico, text="Atendimentos mais recentes primeiro", style="Muted.TLabel").grid(row=0, column=0, sticky="w", pady=(0, 10))
+        self.tabela_historico = self._tabela(historico, ("senha", "nome", "categoria"), ("SENHA", "CLIENTE", "TIPO"))
         self.resumo_historico = tk.StringVar()
         ttk.Label(historico, textvariable=self.resumo_historico, style="Muted.TLabel").grid(row=2, column=0, sticky="w", pady=(10, 0))
-        ttk.Label(didatica, text="O que acontece por trás da tela", style="Title.TLabel").pack(anchor="w", pady=(0, 16))
-        self.estruturas_texto = tk.StringVar()
-        self.texto_didatico = tk.Text(didatica, wrap="word", bg="white", fg=TEXTO, relief="flat",
-                                      font=(self.fonte, 11), height=10, padx=4, pady=4)
-        rolagem_didatica = ttk.Scrollbar(didatica, orient="vertical", command=self.texto_didatico.yview)
-        self.texto_didatico.configure(yscrollcommand=rolagem_didatica.set)
-        rolagem_didatica.pack(side="right", fill="y")
-        self.texto_didatico.pack(fill="both", expand=True)
-        chamada = ttk.Frame(direita, style="Card.TFrame", padding=(16, 12))
-        chamada.grid(row=1, column=0, sticky="ew", pady=(14, 0))
-        bloco = ttk.Frame(chamada, style="Card.TFrame")
-        bloco.pack(side="left", fill="x", expand=True)
-        ttk.Label(bloco, text="PRÓXIMO ATENDIMENTO", style="Muted.TLabel").pack(anchor="w")
-        self.proximo_texto = tk.StringVar()
-        ttk.Label(bloco, textvariable=self.proximo_texto, style="Title.TLabel", wraplength=430).pack(anchor="w", pady=(4, 0))
-        self.botao_atender = ttk.Button(chamada, text="Chamar próximo  →", style="Primary.TButton", command=self.atender)
-        self.botao_atender.pack(side="right")
-        rodape = ttk.Frame(self.root, padding=(24, 12))
+
+        rodape = ttk.Frame(self.root, padding=(22, 10, 22, 14))
         rodape.grid(row=4, column=0, sticky="ew")
-        self.botao_desfazer = ttk.Button(rodape, text="↶ Desfazer", command=lambda: self.reverter(False))
-        self.botao_desfazer.pack(side="left")
-        self.botao_refazer = ttk.Button(rodape, text="↷ Refazer", command=lambda: self.reverter(True))
-        self.botao_refazer.pack(side="left", padx=8)
-        ttk.Label(rodape, textvariable=self.status, wraplength=650, foreground=CINZA).pack(side="left", padx=14)
+        rodape.columnconfigure(0, weight=1)
+        self.indicadores = {chave: tk.StringVar(value="0") for chave in ("pendentes", "prioritarios", "atendidos", "cancelados")}
+        self.resumo_geral = tk.StringVar()
+        ttk.Label(rodape, textvariable=self.resumo_geral, foreground=CINZA).grid(row=0, column=0, sticky="w", pady=(0, 8))
+        ttk.Label(rodape, textvariable=self.status, wraplength=640).grid(row=1, column=0, sticky="w")
+        self.botao_desfazer = ttk.Button(rodape, text="Desfazer", command=lambda: self.reverter(False))
+        self.botao_desfazer.grid(row=0, column=1, rowspan=2, padx=(12, 6))
+        self.botao_refazer = ttk.Button(rodape, text="Refazer", command=lambda: self.reverter(True))
+        self.botao_refazer.grid(row=0, column=2, rowspan=2)
 
     def _tabela(self, parent, colunas, titulos):
         quadro = ttk.Frame(parent, style="Card.TFrame")
@@ -192,14 +171,14 @@ class AplicacaoBancaria:
         tabela = ttk.Treeview(quadro, columns=colunas, show="headings", selectmode="browse", height=6)
         for coluna, titulo in zip(colunas, titulos):
             tabela.heading(coluna, text=titulo, anchor="w")
-            largura = {"posicao": 80, "senha": 90, "nome": 280, "categoria": 135}[coluna]
+            largura = {"posicao": 85, "senha": 100, "nome": 380, "categoria": 160}[coluna]
             tabela.column(coluna, width=largura, minwidth=65, stretch=coluna == "nome", anchor="w")
         scrollbar = ttk.Scrollbar(quadro, orient="vertical", command=tabela.yview)
         tabela.configure(yscrollcommand=scrollbar.set)
         scrollbar.pack(side="right", fill="y")
         tabela.pack(fill="both", expand=True)
-        tabela.tag_configure("par", background="#f7f9fc")
-        tabela.tag_configure("prioritario", foreground=VERDE)
+        tabela.tag_configure("par", background="#f6f8fa")
+        tabela.tag_configure("prioritario", foreground=AZUL)
         return tabela
 
     def _botoes(self):
@@ -236,25 +215,9 @@ class AplicacaoBancaria:
         self.resumo_historico.set(f"{estatisticas['atendidos']} atendimentos registrados nesta sessão.")
         proximo = self.sistema.proximo()
         self.proximo_texto.set(f"{proximo.senha}  •  {proximo.nome}" if proximo else "Nenhum cliente em espera")
-        p = " → ".join(c.senha for c in self.sistema.prioritaria) or "vazia"
-        n = " → ".join(c.senha for c in self.sistema.normal) or "vazia"
-        self.estruturas_texto.set(
-            f"FILA FIFO • encadeada, entrada no fim e saída no início\nPrioritários: {p}\nNormais: {n}\n\n"
-            f"LISTA ENCADEADA • histórico com inserção no início\n{estatisticas['atendidos']} registros; busca linear O(n).\n\n"
-            f"DUAS PILHAS LIFO • comandos inversos para desfazer/refazer\n"
-            f"Desfazer: {self.sistema.desfazer.quantidade}  |  Refazer: {self.sistema.refazer.quantidade}\n\n"
-            "A interface percorre as estruturas do núcleo. A tabela não decide quem será chamado.")
-        self.texto_didatico.configure(state="normal")
-        self.texto_didatico.delete("1.0", "end")
-        self.texto_didatico.insert("1.0", self.estruturas_texto.get() + "\n\nOS CINCO ENTREGÁVEIS\n\n"
-                                  "01  Funções, parâmetros e recursividade\n"
-                                  "02  TAD Conta Bancária e armazenamento\n"
-                                  "03  Listas sequenciais e encadeadas\n"
-                                  "04  Pilhas e balanceamento de delimitadores\n"
-                                  "05  Filas circulares, encadeadas e prioritárias")
-        self.texto_didatico.configure(state="disabled")
+        self.resumo_geral.set(f"Aguardando: {estatisticas['pendentes']}    |    Prioritários: {estatisticas['prioritarios']}    |    Atendidos: {estatisticas['atendidos']}    |    Cancelados: {estatisticas['cancelados']}")
         self._botoes()
-        self.root.title(f"Banco Acadêmico • Atendimento{' • alterações não salvas' if self.alterado else ''}")
+        self.root.title(f"Central de Atendimento Bancário{' • alterações não salvas' if self.alterado else ''}")
 
     def _mudou(self, texto):
         self.alterado = True
@@ -385,3 +348,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Interface gráfica do atendimento bancário")
     parser.add_argument("--demo", action="store_true", help="iniciar com clientes fictícios")
     executar(parser.parse_args().demo)
+

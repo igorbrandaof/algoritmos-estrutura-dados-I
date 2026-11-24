@@ -45,7 +45,7 @@ Estado total O(n+h), com n clientes ativos/atendidos e h comandos de reversão. 
 
 Dez testes originais do projeto final foram preservados; 36 testes de domínio/persistência e 15 de widgets reais foram acrescentados. Com os entregáveis, são 107 testes locais. Os testes verificam comportamento e fronteiras: FIFO, reclassificação estável, comandos intercalados, invalidação de redo, contadores, arquivo corrompido, duplicatas, falha simulada de salvamento e atualização de tabelas/indicadores.
 
-A GUI foi renderizada no Linux e inspecionada nas dimensões 1240×820 e 1060×740. A validação nativa em Windows/macOS permanece como limitação. Resultados completos em documentacao/RESULTADO_TESTES.md.
+A GUI foi renderizada no Linux e inspecionada nas dimensões 1000×700 e 900×640. A validação nativa em Windows/macOS permanece como limitação. Resultados completos em documentacao/RESULTADO_TESTES.md.
 
 ## 7. Limitações e trabalho futuro
 
@@ -54,3 +54,4 @@ Prioridade estrita pode prolongar espera de normais. Não há promoção automá
 ## 8. Referência e conclusão
 
 O projeto C/GTK de controle de pousos de George Mendes Marra inspirou organização, compartilhamento de núcleo e reclassificação reversível. A solução estende o sistema bancário Python existente e liga cada entregável a uma aplicação de desktop funcional.
+

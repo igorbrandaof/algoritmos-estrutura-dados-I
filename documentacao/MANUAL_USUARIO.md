@@ -1,21 +1,21 @@
-# Manual do usuário — Banco Acadêmico
+# Manual do usuário — Central de Atendimento Bancário
 
 ## 1. Abrir e experimentar
 
-Na raiz: `python projeto_final/interface_grafica.py`. No Windows, também abra `abrir_interface.bat`. Use “Carregar demonstração” ou o argumento `--demo` para experimentar com seis clientes fictícios, um deles já atendido.
+Na raiz: `python projeto_final/interface_grafica.py`. No Windows, também abra `abrir_interface.bat`. Para abrir com clientes fictícios, use `apresentar_prototipo.bat`. Também é possível usar o menu Arquivo → “Carregar demonstração” ou o argumento `--demo` para experimentar com seis clientes fictícios, um deles já atendido.
 
 ![Central de atendimento](interface_grafica.png)
 
 ## 2. Cadastro e atendimento
 
 1. Digite o nome e escolha Normal ou Prioritário.
-2. Clique “Cadastrar cliente”. A senha aparece na tabela e na mensagem inferior.
+2. Clique “Gerar senha”. A senha aparece na tabela e na mensagem inferior.
 3. Confira “Próximo atendimento” e clique “Chamar próximo”.
 4. O cliente sai da fila e entra no histórico; os indicadores são atualizados.
 
-Nome vazio é rejeitado. Espaços repetidos são normalizados. O máximo é 100 caracteres. A tecla Enter no campo de nome também cadastra.
+Nome vazio é rejeitado. Espaços repetidos são normalizados. O máximo é 100 caracteres. A tecla Enter no campo de nome também gera a senha.
 
-“Buscar nome ou senha” filtra a fila sem alterar a ordem de atendimento. Um prioritário oculto pelo filtro continua sendo chamado antes de um normal visível.
+O campo “Buscar” filtra a fila sem alterar a ordem de atendimento. Um prioritário oculto pelo filtro continua sendo chamado antes de um normal visível.
 
 ## 3. Corrigir ou cancelar
 
@@ -35,23 +35,23 @@ Um novo cadastro ou cancelamento limpa as duas pilhas. Uma nova operação rever
 
 ![Histórico](interface_historico.png)
 
-O histórico é mostrado do atendimento mais recente para o mais antigo. Os cartões contam a fila atual, prioritários pendentes, atendidos atuais e cancelamentos. Um atendimento desfeito diminui o total de atendidos.
+O histórico é mostrado do atendimento mais recente para o mais antigo. A linha inferior mostra os totais de clientes aguardando, prioritários pendentes, atendidos e cancelamentos. Um atendimento desfeito diminui o total de atendidos.
 
 ## 6. Salvar, abrir e exportar
 
-- **Salvar sessão** (Ctrl+S): escolha um arquivo JSON. Salva filas, histórico e contadores. A escrita usa arquivo temporário e substituição atômica.
-- **Abrir sessão**: escolha um JSON gerado pelo aplicativo. Arquivos corrompidos ou inconsistentes são rejeitados sem substituir o estado atual. Ao abrir, undo/redo começa vazio.
-- **Exportar CSV**: gera relatório da fila e histórico com ponto e vírgula, UTF-8 com BOM. Pode ser aberto em uma planilha. A exportação não substitui o salvamento da sessão.
+- No menu **Arquivo**, use **Salvar sessão** (Ctrl+S): escolha um arquivo JSON. Salva filas, histórico e contadores. A escrita usa arquivo temporário e substituição atômica.
+- No menu **Arquivo**, use **Abrir sessão**: escolha um JSON gerado pelo aplicativo. Arquivos corrompidos ou inconsistentes são rejeitados sem substituir o estado atual. Ao abrir, undo/redo começa vazio.
+- No menu **Arquivo**, use **Exportar CSV**: gera relatório da fila e histórico com ponto e vírgula, UTF-8 com BOM. Pode ser aberto em uma planilha. A exportação não substitui o salvamento da sessão.
 
 Ao fechar ou carregar outra sessão/demonstração, a janela oferece **Salvar / Não salvar / Cancelar** se houver alterações. Cancelar o diálogo de arquivo também interrompe a substituição/fechamento quando o usuário escolheu salvar.
 
 Não há autosave. No terminal, utilize a opção Salvar antes de sair.
 
-## 7. Estruturas de dados
+## 7. Apresentar o protótipo
 
-![Modo didático](interface_estruturas.png)
+Extraia o ZIP e abra `apresentar_prototipo.bat` no Windows, com Python instalado. O aplicativo abre com seis clientes fictícios, um deles já atendido. Mostre a geração de uma nova senha, a preferência dos prioritários, a chamada do próximo e o histórico. A versão simplificada tem somente duas abas: Fila de espera e Histórico de atendimentos.
 
-A terceira aba mostra as senhas nas filas, quantidade de registros de histórico e tamanho das pilhas. A área possui rolagem para estados grandes. As tabelas da fila e histórico também possuem rolagem.
+As estruturas internas continuam documentadas em ARQUITETURA.md e nos cinco entregáveis; a interface operacional se concentra no atendimento. As tabelas possuem rolagem.
 
 ## 8. Solução de problemas
 
@@ -65,3 +65,4 @@ A terceira aba mostra as senhas nas filas, quantidade de registros de histórico
 | Cliente normal espera demais | Prioridade estrita é a regra didática; não há promoção por tempo |
 
 Aparência de fontes e controles pode variar entre Windows, Linux e macOS. A janela foi testada com widgets reais no Linux; a validação nativa no Windows continua recomendada.
+

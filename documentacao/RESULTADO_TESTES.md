@@ -1,26 +1,27 @@
-# Resultado de validação — versão com interface gráfica
+# Resultado dos testes da interface simplificada
 
-Data: 14/10/2026 21:08 -03 · Python 3.12.14 · Linux.
+Data: 24/11/2026. Ambiente: Linux, Python 3.12.14.
 
-Comando padrão: `python executar_testes.py` (92 testes).  
-Comando com GUI: `python executar_testes.py --gui` (107 testes).
+Comando: `python executar_testes.py --gui`.
 
-A execução da GUI utilizou display virtual Xvfb e widgets Tkinter reais. Os diálogos modais são simulados nos testes para verificar decisões sem intervenção manual. A janela foi também renderizada e inspecionada em 1240×820 e 1060×740; capturas foram incluídas na documentação.
+Resultado: **107 testes aprovados**: 92 testes dos cinco entregáveis, domínio e persistência; 15 testes de widgets reais da interface gráfica.
 
-| Suíte | Aprovados |
+A interface usa o nome Central de Atendimento Bancário e possui duas abas. Cadastro, prioridade, atendimento, filtro de busca, histórico, reversão, cancelamento, arquivos válidos/inválidos e proteção contra perda de dados foram verificados. Os testes de layout consideram a área de conteúdo da janela e a posição do menu.
+
+A janela foi renderizada e inspecionada em 1000×700 e 900×640 usando Xvfb. As capturas de tela refletem a versão simplificada. Os diálogos são simulados nos testes para verificar as decisões sem intervenção manual. Não houve teste nativo em Windows/macOS nesta execução; os atalhos Windows são entregues para execução local com Python/Tkinter.
+
+## Contagem por suíte
+
+| Suíte | Testes aprovados |
 |---|---:|
 | Entregável 01 | 13 |
 | Entregável 02 | 9 |
 | Entregável 03 | 9 |
 | Entregável 04 | 7 |
 | Entregável 05 | 8 |
-| Projeto final: domínio/persistência | 46 |
+| Projeto final | 46 |
 | Interface gráfica | 15 |
-| **Total** | **107** |
-
-Os 28 testes originais foram preservados. As cinco demonstrações executaram sem erro. O terminal foi exercitado com cadastro normal/prioritário, atendimento, desfazer, refazer e indicadores. Os links locais Markdown e a compilação sintática dos arquivos Python foram conferidos.
-
-Limites: não houve execução nativa no Windows/macOS nem do workflow remoto. Não se alega cobertura de linhas medida ou validação para uso bancário real. As versões Python da matriz CI ainda serão verificadas após envio aprovado.
+| Total | 107 |
 
 ## Saída completa
 
@@ -43,7 +44,7 @@ test_referencias_mutaveis_e_imutaveis (testes_limites.TestesLimites.test_referen
 test_tipos_invalidos (testes_limites.TestesLimites.test_tipos_invalidos) ... ok
 
 ----------------------------------------------------------------------
-Ran 13 tests in 0.000s
+Ran 13 tests in 0.001s
 
 OK
 
@@ -92,7 +93,7 @@ test_lifo_ambas_representacoes (testes_limites.TestesLimites.test_lifo_ambas_rep
 test_overflow_e_reutilizacao (testes_limites.TestesLimites.test_overflow_e_reutilizacao) ... ok
 
 ----------------------------------------------------------------------
-Ran 7 tests in 0.001s
+Ran 7 tests in 0.000s
 
 OK
 
@@ -162,7 +163,7 @@ test_totais_inconsistentes (testes_novos.TestePersistencia.test_totais_inconsist
 test_versao_invalida (testes_novos.TestePersistencia.test_versao_invalida) ... ok
 
 ----------------------------------------------------------------------
-Ran 46 tests in 0.015s
+Ran 46 tests in 0.007s
 
 OK
 
@@ -184,7 +185,7 @@ test_reclassificacao_com_confirmacao (test_interface_grafica.TesteInterface.test
 test_salvar_e_abrir_sessao (test_interface_grafica.TesteInterface.test_salvar_e_abrir_sessao) ... ok
 
 ----------------------------------------------------------------------
-Ran 15 tests in 2.250s
+Ran 15 tests in 0.516s
 
 OK
 ```
