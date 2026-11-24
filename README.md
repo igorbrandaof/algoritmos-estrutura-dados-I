@@ -9,7 +9,13 @@ Sistema de Gerenciamento de Atendimento Bancário em **Python**, com interface g
 
 > Simulação acadêmica. O sistema organiza atendimento; não realiza transações financeiras, autenticação nem integração com bancos. O TAD Conta Bancária do entregável 02 é um exercício independente.
 
-## Comece pela interface gráfica
+## Protótipo no navegador, sem instalar Python
+
+Abra a pasta [prototipo](prototipo/), clique em [index.html](prototipo/index.html) e use **Download raw file** (ícone de download no GitHub). Depois, abra o arquivo baixado no **Chrome** ou **Edge**. O HTML funciona offline.
+
+Para demonstrar o cadastro: **Cadastro de clientes → Preencher exemplo fictício → Salvar ficha → Usar nome na triagem**.
+
+## Interface gráfica em Python
 
 Requisitos: Python **3.10 ou superior** com **Tkinter** e um ambiente gráfico de desktop. Não há pacotes Python externos obrigatórios. Git é necessário apenas para clonar; VS Code é opcional.
 
@@ -56,9 +62,9 @@ python3 -m venv .venv
 
 Não é necessário executar `pip install`. Tkinter é um componente da instalação do Python/sistema operacional, não uma dependência instalada pelo pip.
 
-## Interface simplificada
+## Interface e triagem
 
-A tela principal reúne cadastro de cliente, tipo de atendimento, geração de senha, próximo cliente e fila. O histórico fica na segunda aba. Os totais aparecem em uma linha discreta; abrir/salvar/exportar e carregar demonstração ficam no menu **Arquivo**. Desfazer/refazer, reclassificação e cancelamento continuam disponíveis.
+A tela principal reúne cadastro de cliente, tipo de atendimento, geração de senha, próximo cliente e fila. A fila e o histórico mostram serviço e destino. A aba **Cadastro de clientes** registra nome, CPF, nascimento, telefone e e-mail para a sessão e permite enviar o nome à triagem. Os totais aparecem em uma linha discreta; abrir/salvar/exportar e carregar demonstração ficam no menu **Arquivo**. Desfazer/refazer, reclassificação e cancelamento continuam disponíveis.
 
 O nome do sistema é **Central de Atendimento Bancário**: ele representa o controle de fila de um banco comum. A identificação da disciplina fica na documentação do trabalho.
 
@@ -78,7 +84,7 @@ O nome do sistema é **Central de Atendimento Bancário**: ele representa o cont
 | Relatório CSV | Fila e histórico em UTF-8, compatível com planilhas |
 | Demonstração | Carrega clientes fictícios por ação explícita |
 
-A busca filtra a tabela, mas **não altera quem será chamado**. O campo “Próximo atendimento” sempre representa a fila completa.
+A busca filtra a tabela, mas **não altera quem será chamado**. O campo “Próximo atendimento” segue o destino selecionado: todos, guichê rápido, especialista ou triagem geral.
 
 ## Regras importantes
 
@@ -113,7 +119,7 @@ python executar_testes.py --gui
 
 No Windows, `python` pode ser substituído por `py -3`; no Linux/macOS, por `python3`. Também funcionam `python -m projeto_final.main` e `python -m projeto_final.interface_grafica`.
 
-**Validação desta versão:** 92 testes de algoritmos/domínio/persistência e 15 testes de interface, totalizando **107 testes aprovados**. Os 28 testes originais foram mantidos. Evidências e limites: [RESULTADO_TESTES.md](documentacao/RESULTADO_TESTES.md).
+**Validação desta versão:** 92 testes de algoritmos/domínio/persistência e 17 testes de interface, totalizando **109 testes aprovados**. Os 28 testes originais foram mantidos. Evidências e limites: [RESULTADO_TESTES.md](documentacao/RESULTADO_TESTES.md).
 
 Para testar um entregável isolado, na raiz:
 
@@ -133,6 +139,7 @@ Não utilize a descoberta padrão sem `-p "testes*.py"` para os entregáveis: os
 | `entregavel_03/` | Listas sequencial, simples, dupla e circular |
 | `entregavel_04/` | Pilhas em array e encadeadas; balanceamento de delimitadores |
 | `entregavel_05/` | Filas circular, encadeada e de prioridade |
+| `prototipo/` | Demonstração offline para o navegador |
 | `projeto_final/` | Núcleo do sistema, terminal, interface gráfica e persistência |
 | `documentacao/` | Relatórios, apresentação original, manuais, arquitetura e telas |
 | `executar_testes.py` | Executor central das seis suítes e testes opcionais da GUI |
@@ -146,8 +153,9 @@ O terminal e a GUI chamam o mesmo `SistemaBancario`. As telas não implementam n
 
 | Operação do núcleo | Tempo | Motivo |
 |---|---|---|
-| Cadastro, próximo, atender | O(1) nas estruturas | Referências para início/fim; inserção no início do histórico |
-| Desfazer/refazer atendimento | O(1) | Operações no topo da pilha, início da fila e histórico |
+| Cadastro e próximo sem filtro | O(1) nas estruturas | Referências para início/fim |
+| Próximo por destino e atendimento | O(n) no pior caso | Busca por destino e remoção da senha escolhida |
+| Desfazer/refazer atendimento | O(n) no pior caso | Busca, remoção ou reinserção na fila por ordem de chegada |
 | Reclassificar e reverter reclassificação | O(n) | Busca, remoção e reinserção pela ordem de chegada |
 | Cancelar, buscar, pesquisar | O(n) | Busca linear na estrutura |
 | Listar, salvar, exportar | O(n) | Percurso de todos os registros |

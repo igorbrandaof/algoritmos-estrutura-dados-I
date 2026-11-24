@@ -1,5 +1,11 @@
 """Interface desktop em Tkinter/ttk; todas as regras vivem em SistemaBancario."""
 import argparse
+from datetime import datetime, date
+import re
+if __package__:
+    from .cliente import SERVICOS
+else:
+    from cliente import SERVICOS
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from pathlib import Path
@@ -21,10 +27,10 @@ CINZA = "#63748b"
 
 def preencher_demonstracao(sistema):
     """Dados fictícios, carregados apenas por ação explícita ou --demo."""
-    for nome, prioridade in (("Ana Oliveira", False), ("Carlos Mendes", True),
+    for (nome, prioridade), servico in zip( (("Ana Oliveira", False), ("Carlos Mendes", True),
                              ("Marina Costa", False), ("João Santos", True),
-                             ("Beatriz Lima", False), ("Lucas Ferreira", False)):
-        sistema.cadastrar(nome, prioridade)
+                             ("Beatriz Lima", False), ("Lucas Ferreira", False)), ("Saque", "Crédito", "Depósito", "Abertura de conta", "Impressão de extrato", "Renegociação")):
+        sistema.cadastrar(nome, prioridade, servico)
     sistema.atender()
 
 
@@ -37,6 +43,8 @@ class AplicacaoBancaria:
         self.nome = tk.StringVar()
         self.prioridade = tk.StringVar(value="Normal")
         self.busca = tk.StringVar()
+        self.servico = tk.StringVar(value="Saque")
+        self.destino = tk.StringVar(value="Todos")
         self.status = tk.StringVar(value="Pronto. Cadastre um cliente para iniciar o atendimento.")
         self.root.title("Central de Atendimento Bancário")
         self.root.geometry("1000x700")
@@ -44,6 +52,7 @@ class AplicacaoBancaria:
         self.root.configure(bg=FUNDO)
         self.root.rowconfigure(3, weight=1)
         self.root.columnconfigure(0, weight=1)
+        self.cadastros = {}
         self._estilos()
         self._construir()
         self.busca.trace_add("write", lambda *_: self.atualizar())
@@ -99,7 +108,7 @@ class AplicacaoBancaria:
         cabecalho.grid(row=0, column=0, sticky="ew")
         ttk.Label(cabecalho, text="Central de Atendimento Bancário",
                   font=(self.fonte, 20, "bold")).pack(anchor="w")
-        ttk.Label(cabecalho, text="Controle de senhas e fila de atendimento", foreground=CINZA).pack(anchor="w", pady=(4, 0))
+        ttk.Label(cabecalho, text="Painel de atendimento • Triagem, filas e histórico", foreground=CINZA).pack(anchor="w", pady=(4, 0))
 
         cadastro = ttk.LabelFrame(self.root, text=" Nova senha ", padding=(16, 10, 16, 14))
         cadastro.grid(row=1, column=0, sticky="ew", padx=22, pady=(0, 12))
@@ -111,8 +120,10 @@ class AplicacaoBancaria:
         self.entrada_nome.bind("<Return>", lambda _: self.cadastrar())
         ttk.Combobox(cadastro, textvariable=self.prioridade, values=("Normal", "Prioritário"),
                      state="readonly", width=16).grid(row=1, column=1, sticky="ew", padx=12)
+        ttk.Label(cadastro, text="Serviço solicitado", style="Card.TLabel").grid(row=0, column=2, sticky="w")
+        ttk.Combobox(cadastro, textvariable=self.servico, values=tuple(SERVICOS)[:-1], state="readonly", width=22).grid(row=1, column=2, padx=(0, 12))
         self.botao_cadastrar = ttk.Button(cadastro, text="Gerar senha", command=self.cadastrar)
-        self.botao_cadastrar.grid(row=1, column=2, sticky="ew")
+        self.botao_cadastrar.grid(row=1, column=3, sticky="ew")
 
         chamada = ttk.Frame(self.root, style="Card.TFrame", padding=(16, 12))
         chamada.grid(row=2, column=0, sticky="ew", padx=22, pady=(0, 12))
@@ -121,8 +132,11 @@ class AplicacaoBancaria:
         self.proximo_texto = tk.StringVar()
         ttk.Label(chamada, textvariable=self.proximo_texto, style="Card.TLabel",
                   font=(self.fonte, 14, "bold"), wraplength=520).grid(row=1, column=0, sticky="w", pady=(4, 0))
+        seletor = ttk.Combobox(chamada, textvariable=self.destino, values=("Todos", "Guichê rápido", "Especialista", "Triagem geral"), state="readonly", width=17)
+        seletor.grid(row=0, column=1, rowspan=2, padx=8)
+        seletor.bind("<<ComboboxSelected>>", lambda _: self.atualizar())
         self.botao_atender = ttk.Button(chamada, text="Chamar próximo", style="Primary.TButton", command=self.atender)
-        self.botao_atender.grid(row=0, column=1, rowspan=2, sticky="e", padx=(12, 0))
+        self.botao_atender.grid(row=0, column=2, rowspan=2, sticky="e", padx=(12, 0))
 
         self.abas = ttk.Notebook(self.root)
         self.abas.grid(row=3, column=0, sticky="nsew", padx=22)
@@ -130,6 +144,7 @@ class AplicacaoBancaria:
         historico = ttk.Frame(self.abas, style="Card.TFrame", padding=14)
         self.abas.add(fila, text="Fila de espera")
         self.abas.add(historico, text="Histórico de atendimentos")
+        self._aba_clientes()
         for aba in (fila, historico):
             aba.rowconfigure(1, weight=1)
             aba.columnconfigure(0, weight=1)
@@ -138,7 +153,7 @@ class AplicacaoBancaria:
         ttk.Label(pesquisa, text="Prioritários primeiro; ordem de chegada em cada tipo.", style="Muted.TLabel").pack(side="left")
         ttk.Entry(pesquisa, textvariable=self.busca, width=20).pack(side="right")
         ttk.Label(pesquisa, text="Buscar  ", style="Muted.TLabel").pack(side="right")
-        self.tabela_fila = self._tabela(fila, ("posicao", "senha", "nome", "categoria"), ("POSIÇÃO", "SENHA", "CLIENTE", "TIPO"))
+        self.tabela_fila = self._tabela(fila, ("posicao", "senha", "nome", "categoria", "servico", "destino"), ("POSIÇÃO", "SENHA", "CLIENTE", "TIPO", "SERVIÇO", "DESTINO"))
         self.tabela_fila.bind("<<TreeviewSelect>>", lambda _: self._botoes())
         acoes = ttk.Frame(fila, style="Card.TFrame")
         acoes.grid(row=2, column=0, sticky="ew", pady=(10, 0))
@@ -149,7 +164,7 @@ class AplicacaoBancaria:
         self.botao_reclassificar = ttk.Button(acoes, text="Alterar prioridade", command=self.reclassificar)
         self.botao_reclassificar.pack(side="right", padx=(8, 8))
         ttk.Label(historico, text="Atendimentos mais recentes primeiro", style="Muted.TLabel").grid(row=0, column=0, sticky="w", pady=(0, 10))
-        self.tabela_historico = self._tabela(historico, ("senha", "nome", "categoria"), ("SENHA", "CLIENTE", "TIPO"))
+        self.tabela_historico = self._tabela(historico, ("senha", "nome", "categoria", "servico", "destino"), ("SENHA", "CLIENTE", "TIPO", "SERVIÇO", "DESTINO"))
         self.resumo_historico = tk.StringVar()
         ttk.Label(historico, textvariable=self.resumo_historico, style="Muted.TLabel").grid(row=2, column=0, sticky="w", pady=(10, 0))
 
@@ -165,13 +180,87 @@ class AplicacaoBancaria:
         self.botao_refazer = ttk.Button(rodape, text="Refazer", command=lambda: self.reverter(True))
         self.botao_refazer.grid(row=0, column=2, rowspan=2)
 
+    def _aba_clientes(self):
+        aba = ttk.Frame(self.abas, padding=16)
+        self.abas.add(aba, text="Cadastro de clientes")
+        campos = ("Nome completo", "CPF", "Nascimento (DD/MM/AAAA)", "Telefone", "E-mail")
+        self.ficha = [tk.StringVar() for _ in campos]
+        self.campos_ficha = []
+        form = ttk.Frame(aba)
+        form.pack(fill="x")
+        for i, (label, var) in enumerate(zip(campos, self.ficha)):
+            row, col = divmod(i, 3)
+            form.columnconfigure(col, weight=1)
+            ttk.Label(form, text=label).grid(row=row*2, column=col, sticky="w", padx=4)
+            campo = ttk.Entry(form, textvariable=var)
+            campo.grid(row=row*2+1, column=col, sticky="ew", padx=4, pady=(2, 6))
+            campo.bind("<Return>", lambda _: self._salvar_cliente())
+            self.campos_ficha.append(campo)
+        acoes = ttk.Frame(aba)
+        acoes.pack(fill="x", pady=6)
+        ttk.Button(acoes, text="Salvar ficha", command=self._salvar_cliente).pack(side="left")
+        ttk.Button(acoes, text="Usar nome na triagem", command=self._usar_cliente).pack(side="left", padx=6)
+        ttk.Label(acoes, text="Dados fictícios · cadastro disponível apenas nesta sessão").pack(side="left", padx=8)
+        self.retorno_ficha = tk.StringVar()
+        ttk.Label(aba, textvariable=self.retorno_ficha).pack(anchor="w", pady=(0, 5))
+        self.lista_clientes = ttk.Treeview(aba, columns=("nome", "cpf"), show="headings", height=3)
+        for key, title in (("nome","Cliente"),("cpf","CPF final")):
+            self.lista_clientes.heading(key, text=title)
+        self.lista_clientes.pack(fill="both", expand=True)
+        self.lista_clientes.bind("<<TreeviewSelect>>", self._selecionar_cliente)
+
+    def _salvar_cliente(self):
+        nome, cpf, nascimento, telefone, email = (v.get().strip() for v in self.ficha)
+        cpf = re.sub(r"[.\s-]", "", cpf)
+        def invalid(indice, texto):
+            self.retorno_ficha.set(texto)
+            self.campos_ficha[indice].focus_set()
+
+        if not nome or len(nome) > 100:
+            return invalid(0, "Informe um nome de 1 a 100 caracteres.")
+        if not re.fullmatch(r"[0-9]{11}", cpf):
+            return invalid(1, "Informe um CPF com 11 dígitos, com ou sem pontuação.")
+        try:
+            if not re.fullmatch(r"[0-9]{2}/[0-9]{2}/[0-9]{4}", nascimento):
+                raise ValueError
+            dia = datetime.strptime(nascimento, "%d/%m/%Y").date()
+            if dia > date.today():
+                raise ValueError
+        except ValueError:
+            return invalid(2, "Informe uma data válida no formato DD/MM/AAAA que não esteja no futuro.")
+        if email and not re.fullmatch(r"[^\s@]+@[^\s@]+", email):
+            return invalid(4, "Corrija o e-mail ou deixe o campo em branco.")
+        existente = cpf in self.cadastros
+        self.cadastros[cpf] = (nome, cpf, dia.strftime("%d/%m/%Y"), telefone, email)
+        valores = (nome, "••• " + cpf[-2:])
+        if self.lista_clientes.exists(cpf):
+            self.lista_clientes.item(cpf, values=valores)
+        else:
+            self.lista_clientes.insert("", "end", iid=cpf, values=valores)
+        self.lista_clientes.selection_set(cpf)
+        self.retorno_ficha.set("Ficha atualizada nesta sessão." if existente else
+                              "Ficha salva nesta sessão. Você já pode usar o nome na triagem.")
+
+    def _selecionar_cliente(self, _=None):
+        selecionados = self.lista_clientes.selection()
+        if selecionados:
+            for var, valor in zip(self.ficha, self.cadastros[selecionados[0]]):
+                var.set(valor)
+
+    def _usar_cliente(self):
+        selecionados = self.lista_clientes.selection()
+        if selecionados:
+            self.nome.set(self.cadastros[selecionados[0]][0])
+            self.abas.select(0)
+            self.entrada_nome.focus_set()
+
     def _tabela(self, parent, colunas, titulos):
         quadro = ttk.Frame(parent, style="Card.TFrame")
         quadro.grid(row=1, column=0, sticky="nsew")
         tabela = ttk.Treeview(quadro, columns=colunas, show="headings", selectmode="browse", height=6)
         for coluna, titulo in zip(colunas, titulos):
             tabela.heading(coluna, text=titulo, anchor="w")
-            largura = {"posicao": 85, "senha": 100, "nome": 380, "categoria": 160}[coluna]
+            largura = {"posicao": 75, "senha": 75, "nome": 200, "categoria": 95, "servico": 165, "destino": 130}[coluna]
             tabela.column(coluna, width=largura, minwidth=65, stretch=coluna == "nome", anchor="w")
         scrollbar = ttk.Scrollbar(quadro, orient="vertical", command=tabela.yview)
         tabela.configure(yscrollcommand=scrollbar.set)
@@ -185,7 +274,7 @@ class AplicacaoBancaria:
         selecionado = bool(self.tabela_fila.selection())
         for botao in (self.botao_reclassificar, self.botao_cancelar):
             botao.state(["!disabled" if selecionado else "disabled"])
-        for botao, ativo in ((self.botao_atender, self.sistema.proximo() is not None),
+        for botao, ativo in ((self.botao_atender, self.sistema.proximo(None if self.destino.get() == "Todos" else self.destino.get()) is not None),
                              (self.botao_desfazer, not self.sistema.desfazer.vazia()),
                              (self.botao_refazer, not self.sistema.refazer.vazia())):
             botao.state(["!disabled" if ativo else "disabled"])
@@ -205,16 +294,16 @@ class AplicacaoBancaria:
             tags = ("par",) if i % 2 == 0 else ()
             if c.prioritario:
                 tags += ("prioritario",)
-            self.tabela_fila.insert("", "end", iid=c.senha, values=(f"{i:02d}", c.senha, c.nome, c.categoria), tags=tags)
+            self.tabela_fila.insert("", "end", iid=c.senha, values=(f"{i:02d}", c.senha, c.nome, c.categoria, c.servico, c.destino), tags=tags)
             visiveis += 1
         if selecao and self.tabela_fila.exists(selecao[0]):
             self.tabela_fila.selection_set(selecao)
         for i, c in enumerate(self.sistema.atendidos()):
-            self.tabela_historico.insert("", "end", values=(c.senha, c.nome, c.categoria), tags=("par",) if i % 2 else ())
+            self.tabela_historico.insert("", "end", values=(c.senha, c.nome, c.categoria, c.servico, c.destino), tags=("par",) if i % 2 else ())
         self.resumo_fila.set(f"{visiveis} de {estatisticas['pendentes']} clientes exibidos • {estatisticas['normais']} normais")
         self.resumo_historico.set(f"{estatisticas['atendidos']} atendimentos registrados nesta sessão.")
-        proximo = self.sistema.proximo()
-        self.proximo_texto.set(f"{proximo.senha}  •  {proximo.nome}" if proximo else "Nenhum cliente em espera")
+        proximo = self.sistema.proximo(None if self.destino.get() == "Todos" else self.destino.get())
+        self.proximo_texto.set(f"{proximo.senha}  •  {proximo.nome} | {proximo.servico} → {proximo.destino}" if proximo else "Nenhum cliente em espera")
         self.resumo_geral.set(f"Aguardando: {estatisticas['pendentes']}    |    Prioritários: {estatisticas['prioritarios']}    |    Atendidos: {estatisticas['atendidos']}    |    Cancelados: {estatisticas['cancelados']}")
         self._botoes()
         self.root.title(f"Central de Atendimento Bancário{' • alterações não salvas' if self.alterado else ''}")
@@ -226,7 +315,7 @@ class AplicacaoBancaria:
 
     def cadastrar(self):
         try:
-            c = self.sistema.cadastrar(self.nome.get(), self.prioridade.get() == "Prioritário")
+            c = self.sistema.cadastrar(self.nome.get(), self.prioridade.get() == "Prioritário", self.servico.get())
         except ValueError as erro:
             messagebox.showerror("Cadastro inválido", str(erro), parent=self.root)
             return
@@ -235,7 +324,7 @@ class AplicacaoBancaria:
         self.entrada_nome.focus_set()
 
     def atender(self):
-        c = self.sistema.atender()
+        c = self.sistema.atender(None if self.destino.get() == "Todos" else self.destino.get())
         if c is not None:
             self._mudou(f"Atendimento registrado: {c.senha} • {c.nome}.")
 

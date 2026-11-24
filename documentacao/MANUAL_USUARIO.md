@@ -8,9 +8,9 @@ Na raiz: `python projeto_final/interface_grafica.py`. No Windows, também abra `
 
 ## 2. Cadastro e atendimento
 
-1. Digite o nome e escolha Normal ou Prioritário.
+1. Digite o nome, escolha Normal ou Prioritário e selecione o serviço.
 2. Clique “Gerar senha”. A senha aparece na tabela e na mensagem inferior.
-3. Confira “Próximo atendimento” e clique “Chamar próximo”.
+3. Escolha o destino, confira “Próximo atendimento” e clique “Chamar próximo”.
 4. O cliente sai da fila e entra no histórico; os indicadores são atualizados.
 
 Nome vazio é rejeitado. Espaços repetidos são normalizados. O máximo é 100 caracteres. A tecla Enter no campo de nome também gera a senha.
@@ -49,7 +49,9 @@ Não há autosave. No terminal, utilize a opção Salvar antes de sair.
 
 ## 7. Apresentar o protótipo
 
-Extraia o ZIP e abra `apresentar_prototipo.bat` no Windows, com Python instalado. O aplicativo abre com seis clientes fictícios, um deles já atendido. Mostre a geração de uma nova senha, a preferência dos prioritários, a chamada do próximo e o histórico. A versão simplificada tem somente duas abas: Fila de espera e Histórico de atendimentos.
+Para a versão sem instalação, siga as [instruções do protótipo HTML](../prototipo/). Com Python no Windows, abra `apresentar_prototipo.bat`. A interface tem três abas: fila, histórico e cadastro de clientes.
+
+Na aba de cadastro, informe nome, CPF com 11 dígitos e nascimento em DD/MM/AAAA. Telefone e e-mail são opcionais. Após salvar, selecione a ficha e use **Usar nome na triagem**. As fichas ficam somente na sessão e não são incluídas na exportação.
 
 As estruturas internas continuam documentadas em ARQUITETURA.md e nos cinco entregáveis; a interface operacional se concentra no atendimento. As tabelas possuem rolagem.
 

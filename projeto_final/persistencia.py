@@ -8,10 +8,10 @@ from dataclasses import asdict
 from pathlib import Path
 
 if __package__:
-    from .cliente import Cliente
+    from .cliente import Cliente, SERVICOS
     from .sistema import SistemaBancario
 else:
-    from cliente import Cliente
+    from cliente import Cliente, SERVICOS
     from sistema import SistemaBancario
 
 VERSAO = 1
@@ -72,7 +72,7 @@ def carregar_sessao(caminho):
             raise ValueError("Lista de clientes inválida.")
         grupos[grupo] = []
         for item in itens:
-            if not isinstance(item, dict) or set(item) != {"nome", "senha", "prioritario", "ordem"}:
+            if not isinstance(item, dict) or set(item) - {"servico"} != {"nome", "senha", "prioritario", "ordem"}:
                 raise ValueError("Registro de cliente inválido.")
             nome, senha, prioridade, ordem = (item[k] for k in ("nome", "senha", "prioritario", "ordem"))
             if not isinstance(nome, str) or not nome.strip() or len(nome) > 100 or nome != " ".join(nome.split()):
@@ -91,7 +91,10 @@ def carregar_sessao(caminho):
                 raise ValueError("Cliente na fila incorreta.")
             senhas.add(senha)
             ordens.add(ordem)
-            grupos[grupo].append(Cliente(nome, senha, prioridade, ordem))
+            servico = item.get("servico", "Não informado")
+            if not isinstance(servico, str) or servico not in SERVICOS:
+                raise ValueError("Serviço inválido.")
+            grupos[grupo].append(Cliente(nome, senha, prioridade, ordem, servico))
         if grupo != "historico" and any(a.ordem >= b.ordem for a, b in zip(grupos[grupo], grupos[grupo][1:])):
             raise ValueError("Ordem FIFO inconsistente.")
     total = contadores["normal"] + contadores["prioritaria"]
@@ -120,7 +123,7 @@ def exportar_csv(sistema, caminho):
     """Relatório de fila e histórico em UTF-8 com BOM, separado por ponto e vírgula."""
     with Path(caminho).open("w", encoding="utf-8-sig", newline="") as arquivo:
         escritor = csv.writer(arquivo, delimiter=";")
-        escritor.writerow(("Situacao", "Senha", "Nome", "Categoria", "Ordem de chegada"))
+        escritor.writerow(("Situacao", "Senha", "Nome", "Categoria", "Serviço", "Destino", "Ordem de chegada"))
         for situacao, clientes in (("Em espera", sistema.fila_ordenada()), ("Atendido", sistema.atendidos())):
             for cliente in clientes:
-                escritor.writerow((situacao, cliente.senha, _texto_csv(cliente.nome), cliente.categoria, cliente.ordem))
+                escritor.writerow((situacao, cliente.senha, _texto_csv(cliente.nome), cliente.categoria, cliente.servico, cliente.destino, cliente.ordem))

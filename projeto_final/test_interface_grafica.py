@@ -134,7 +134,7 @@ class TesteInterface(unittest.TestCase):
     def test_abas_e_layout_minimo(self):
         self.root.geometry("900x640")
         self.root.update()
-        self.assertEqual(len(self.app.abas.tabs()), 2)
+        self.assertEqual(len(self.app.abas.tabs()), 3)
         self.assertTrue(self.app.botao_atender.winfo_viewable())
         self.assertTrue(self.app.botao_desfazer.winfo_viewable())
         self.assertTrue(self.app.botao_cancelar.winfo_viewable())
@@ -146,3 +146,21 @@ class TesteInterface(unittest.TestCase):
         self.assertTrue(self.app.tabela_historico.winfo_viewable())
         self.assertIn("Central de Atendimento Bancário", self.root.title())
 
+
+    def test_salvar_ficha_com_data_e_cpf_formatados(self):
+        self.app.abas.select(2)
+        for var, valor in zip(self.app.ficha, ("Cliente Teste", "123.456.789-00", "12/05/1995", "", "")):
+            var.set(valor)
+        self.app._salvar_cliente()
+        self.root.update()
+        self.assertEqual(self.app.lista_clientes.selection(), ("12345678900",))
+        self.assertIn("Ficha salva", self.app.retorno_ficha.get())
+        self.app._usar_cliente()
+        self.assertEqual(self.app.nome.get(), "Cliente Teste")
+
+    def test_ficha_invalida_exibe_erro_sem_cadastrar(self):
+        for var, valor in zip(self.app.ficha, ("Cliente Teste", "12345678900", "31/02/1995", "", "")):
+            var.set(valor)
+        self.app._salvar_cliente()
+        self.assertIn("DD/MM/AAAA", self.app.retorno_ficha.get())
+        self.assertEqual(self.app.lista_clientes.get_children(), ())

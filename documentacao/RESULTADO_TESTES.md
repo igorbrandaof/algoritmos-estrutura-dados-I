@@ -1,14 +1,14 @@
-# Resultado dos testes da interface simplificada
+# Resultado dos testes da interface com triagem
 
 Data: 24/11/2026. Ambiente: Linux, Python 3.12.14.
 
 Comando: `python executar_testes.py --gui`.
 
-Resultado: **107 testes aprovados**: 92 testes dos cinco entregáveis, domínio e persistência; 15 testes de widgets reais da interface gráfica.
+Resultado: **109 testes aprovados**: 92 testes dos cinco entregáveis, domínio e persistência; 17 testes de widgets reais da interface gráfica.
 
-A interface usa o nome Central de Atendimento Bancário e possui duas abas. Cadastro, prioridade, atendimento, filtro de busca, histórico, reversão, cancelamento, arquivos válidos/inválidos e proteção contra perda de dados foram verificados. Os testes de layout consideram a área de conteúdo da janela e a posição do menu.
+A interface usa o nome Central de Atendimento Bancário e possui três abas. Cadastro, prioridade, atendimento, filtro de busca, histórico, reversão, cancelamento, cadastro de fichas e uso do nome na triagem, arquivos válidos/inválidos e proteção contra perda de dados foram verificados. Os testes de layout consideram a área de conteúdo da janela e a posição do menu.
 
-A janela foi renderizada e inspecionada em 1000×700 e 900×640 usando Xvfb. As capturas de tela refletem a versão simplificada. Os diálogos são simulados nos testes para verificar as decisões sem intervenção manual. Não houve teste nativo em Windows/macOS nesta execução; os atalhos Windows são entregues para execução local com Python/Tkinter.
+A janela foi renderizada e inspecionada em 1000×700 e 900×640 usando Xvfb. As capturas de tela mostram a versão com triagem. Os diálogos são simulados nos testes para verificar as decisões sem intervenção manual. Não houve teste nativo em Windows/macOS nesta execução; os atalhos Windows são entregues para execução local com Python/Tkinter.
 
 ## Contagem por suíte
 
@@ -20,8 +20,8 @@ A janela foi renderizada e inspecionada em 1000×700 e 900×640 usando Xvfb. As 
 | Entregável 04 | 7 |
 | Entregável 05 | 8 |
 | Projeto final | 46 |
-| Interface gráfica | 15 |
-| Total | 107 |
+| Interface gráfica | 17 |
+| Total | 109 |
 
 ## Saída completa
 
@@ -44,7 +44,7 @@ test_referencias_mutaveis_e_imutaveis (testes_limites.TestesLimites.test_referen
 test_tipos_invalidos (testes_limites.TestesLimites.test_tipos_invalidos) ... ok
 
 ----------------------------------------------------------------------
-Ran 13 tests in 0.001s
+Ran 13 tests in 0.000s
 
 OK
 
@@ -163,7 +163,7 @@ test_totais_inconsistentes (testes_novos.TestePersistencia.test_totais_inconsist
 test_versao_invalida (testes_novos.TestePersistencia.test_versao_invalida) ... ok
 
 ----------------------------------------------------------------------
-Ran 46 tests in 0.007s
+Ran 46 tests in 0.008s
 
 OK
 
@@ -178,14 +178,16 @@ test_cancelamento_confirmado (test_interface_grafica.TesteInterface.test_cancela
 test_cancelamento_recusado_preserva_fila (test_interface_grafica.TesteInterface.test_cancelamento_recusado_preserva_fila) ... ok
 test_cancelar_dialogo_salvar_mantem_alterado (test_interface_grafica.TesteInterface.test_cancelar_dialogo_salvar_mantem_alterado) ... ok
 test_exportar_csv_nao_marca_sessao_salva (test_interface_grafica.TesteInterface.test_exportar_csv_nao_marca_sessao_salva) ... ok
+test_ficha_invalida_exibe_erro_sem_cadastrar (test_interface_grafica.TesteInterface.test_ficha_invalida_exibe_erro_sem_cadastrar) ... ok
 test_inicio_vazio_botoes_desabilitados (test_interface_grafica.TesteInterface.test_inicio_vazio_botoes_desabilitados) ... ok
 test_prioritario_primeiro (test_interface_grafica.TesteInterface.test_prioritario_primeiro) ... ok
 test_protecao_contra_perda_cancelar (test_interface_grafica.TesteInterface.test_protecao_contra_perda_cancelar) ... ok
 test_reclassificacao_com_confirmacao (test_interface_grafica.TesteInterface.test_reclassificacao_com_confirmacao) ... ok
 test_salvar_e_abrir_sessao (test_interface_grafica.TesteInterface.test_salvar_e_abrir_sessao) ... ok
+test_salvar_ficha_com_data_e_cpf_formatados (test_interface_grafica.TesteInterface.test_salvar_ficha_com_data_e_cpf_formatados) ... ok
 
 ----------------------------------------------------------------------
-Ran 15 tests in 0.516s
+Ran 17 tests in 0.776s
 
 OK
 ```

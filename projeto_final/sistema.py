@@ -6,10 +6,10 @@ reclassificação usam duas pilhas encadeadas de comandos inversos (undo/redo).
 from dataclasses import dataclass, replace
 
 if __package__:
-    from .cliente import Cliente
+    from .cliente import Cliente, SERVICOS
     from .estruturas import Fila, Pilha, ListaHistorico
 else:
-    from cliente import Cliente
+    from cliente import Cliente, SERVICOS
     from estruturas import Fila, Pilha, ListaHistorico
 
 
@@ -37,7 +37,7 @@ class SistemaBancario:
         self.desfazer.limpar()
         self.refazer.limpar()
 
-    def cadastrar(self, nome, prioritario=False):
+    def cadastrar(self, nome, prioritario=False, servico="Não informado"):
         if not isinstance(nome, str) or not nome.strip():
             raise ValueError("Informe o nome do cliente.")
         nome = " ".join(nome.split())
@@ -45,6 +45,8 @@ class SistemaBancario:
             raise ValueError("O nome deve ter no máximo 100 caracteres.")
         if not isinstance(prioritario, bool):
             raise ValueError("A prioridade deve ser booleana.")
+        if not isinstance(servico, str) or servico not in SERVICOS:
+            raise ValueError("Selecione um serviço válido.")
         if prioritario:
             self._seq_prioritaria += 1
             senha = f"P{self._seq_prioritaria:03d}"
@@ -52,19 +54,21 @@ class SistemaBancario:
             self._seq_normal += 1
             senha = f"N{self._seq_normal:03d}"
         self._ordem += 1
-        cliente = Cliente(nome, senha, prioritario, self._ordem)
+        cliente = Cliente(nome, senha, prioritario, self._ordem, servico)
         self._fila(prioritario).enfileirar(cliente)
         self._limpar_reversoes()
         return cliente
 
-    def proximo(self):
+    def proximo(self, destino=None):
+        if destino:
+            return next((c for c in self.fila_ordenada() if c.destino == destino), None)
         return self.prioritaria.frente() or self.normal.frente()
 
-    def atender(self):
-        cliente = self.proximo()
+    def atender(self, destino=None):
+        cliente = self.proximo(destino)
         if cliente is None:
             return None
-        self._fila(cliente.prioritario).desenfileirar()
+        self._fila(cliente.prioritario).remover(cliente.senha)
         self.historico.inserir_inicio(cliente)
         self.desfazer.empilhar(Operacao("atendimento", cliente))
         self.refazer.limpar()
@@ -107,7 +111,7 @@ class SistemaBancario:
             if self.historico.inicio is None or self.historico.inicio.valor != operacao.antes:
                 raise RuntimeError("Histórico inconsistente.")
             self.historico.remover_inicio()
-            self._fila(operacao.antes.prioritario).colocar_na_frente(operacao.antes)
+            self._fila(operacao.antes.prioritario).inserir_por_ordem(operacao.antes)
         else:
             self._trocar_categoria(operacao.depois, operacao.antes)
         self.desfazer.desempilhar()
@@ -119,9 +123,9 @@ class SistemaBancario:
         if operacao is None:
             return None
         if operacao.tipo == "atendimento":
-            if self.proximo() != operacao.antes:
+            if self.buscar_pendente(operacao.antes.senha) != operacao.antes:
                 raise RuntimeError("Fila inconsistente ao refazer.")
-            self._fila(operacao.antes.prioritario).desenfileirar()
+            self._fila(operacao.antes.prioritario).remover(operacao.antes.senha)
             self.historico.inserir_inicio(operacao.antes)
         else:
             self._trocar_categoria(operacao.antes, operacao.depois)
